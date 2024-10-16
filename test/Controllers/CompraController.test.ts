@@ -157,9 +157,28 @@ describe('CompraController', () => {
             expect(res.status).toBeCalledWith(200);
             expect(res.json).toBeCalledWith(compra);
         });
-        
 
         it('deve retornar 500 quando ocorrer erro ao atualizar compra', async () => {
+            const compra = { id: 1, idIngressos: [1, 2], idUsuario: 1, dataCompra: new Date() } as Compra;
+            const req = { params: { id: 1 }, body: compra } as unknown as Request;
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn(),
+            } as any;
+        
+            // Simula um erro na atualização da compra
+            jest.spyOn(compraRepository, 'atualizarCompra').mockRejectedValue(new Error('Falha ao atualizar compra'));
+        
+            await compraController.atualizarCompra(req, res);
+        
+            // Verificar se o status retornado é 500
+            expect(res.status).toBeCalledWith(500);
+            expect(res.json).toBeCalledWith({ error: 'Nao foi possivel atualizar compra' });
+        
+        });
+        
+
+        /*it('deve retornar 500 quando ocorrer erro ao atualizar compra', async () => {
             const compra = { id: 1, idIngressos: [1, 2], idUsuario: 1, dataCompra: new Date() } as Compra;
             const req = { params: { id: 1 }, body: compra } as unknown as Request;
             const res = {
@@ -175,7 +194,7 @@ describe('CompraController', () => {
             // Verifica se o status retornado é 500
             expect(res.status).toBeCalledWith(500);
             expect(res.json).toBeCalledWith({ error: 'Nao foi possivel atualizar compra' });
-        });
+        });*/
         
 
         it('deve retornar 404 quando compra nao for encontrada', async () => {
